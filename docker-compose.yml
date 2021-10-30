@@ -1,13 +1,21 @@
 version: '3'
 services:
-  micros_eureka:
+  eureka-server:
     image: openjdk:8
-    container_name: micros_eureka
+    container_name: eureka-server
+    hostname: eureka-server
     ports:
       - "8761:8761"
     volumes:
       - ./eureka/target:/var/jars
     command: java -jar /var/jars/eureka-0.0.1-SNAPSHOT.jar
+  #eureka-server:
+   # image: springcloud/eureka
+    #hostname: eureka-server
+    #volumes:
+    #  - ./tmp:/tmp
+    #ports:
+    #  - "8761:8761"
   micros_spring_app_a:
     image: openjdk:8
     container_name: micros_spring_app_a
@@ -17,9 +25,9 @@ services:
       - ./spring-app-a/target:/var/jars
     command: java -jar /var/jars/spring-app-a-0.0.1-SNAPSHOT.jar
     links:
-      - micros_eureka
+      - eureka-server
     environment:
-      EUREKA_URI: http://micros_eureka:8761/eureka
+      EUREKA_URI: http://eureka-server:8761/eureka
   micros_spring_app_b:
     image: openjdk:8
     container_name: micros_spring_app_b
@@ -29,6 +37,6 @@ services:
       - ./spring-app-b/target:/var/jars
     command: java -jar /var/jars/spring-app-b-0.0.1-SNAPSHOT.jar
     links:
-      - micros_eureka
+      - eureka-server
     environment:
-      EUREKA_URI: http://micros_eureka:8761/eureka
+      EUREKA_URI: http://eureka-server:8761/eureka
