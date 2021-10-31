@@ -5,7 +5,6 @@ import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +35,7 @@ public class ExternalInfoServiceImpl implements ExternalInfoService {
 
     @Override
     public String getInfoFromApplicationBDirect() {
-        String appBURL = "http://micros_spring_app_b:8082/home";
+        String appBURL = "http://spring-app-b:8082/home";
         return restTemplate.exchange(appBURL, HttpMethod.GET, null, String.class, new HashMap<>()).getBody();
     }
 }
