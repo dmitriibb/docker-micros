@@ -8,6 +8,14 @@ services:
     volumes:
       - ./eureka/target:/var/jars
     command: java -jar /var/jars/eureka-0.0.1-SNAPSHOT.jar
+  zipkin-server:
+    image: openjdk:8
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    volumes:
+      - ./zipkin:/var/jars
+    command: java -jar /var/jars/zipkin-server-2.23.4-exec.jar
   spring-app-a:
     image: openjdk:8
     container_name: spring-app-a
@@ -18,8 +26,10 @@ services:
     command: java -jar /var/jars/spring-app-a-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
+      - zipkin-server
     environment:
       EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin-server:9411
       SPRING_APP_B_HOST: spring-app-b
   spring-app-b:
     image: openjdk:8
@@ -31,5 +41,21 @@ services:
     command: java -jar /var/jars/spring-app-b-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
+      - zipkin-server
     environment:
       EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin-server:9411
+  spring-app-c:
+    image: openjdk:8
+    container_name: spring-app-c
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./spring-app-c/target:/var/jars
+    command: java -jar /var/jars/spring-app-c-0.0.1-SNAPSHOT.jar
+    links:
+      - eureka-server
+      - zipkin-server
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin-server:9411

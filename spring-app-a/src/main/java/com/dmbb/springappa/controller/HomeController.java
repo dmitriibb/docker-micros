@@ -1,6 +1,6 @@
 package com.dmbb.springappa.controller;
 
-import com.dmbb.springappa.dto.InfoDTO;
+import com.dmbb.springappa.model.dto.InfoDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +20,8 @@ public class HomeController {
     private String eurekaDefaultZone;
 
     @GetMapping
-    public InfoDTO getInfo() {
-        return new InfoDTO("getInfo()", "response from spring-app-a");
+    public String getInfo() {
+        return "Info response from spring-app-a";
     }
 
 

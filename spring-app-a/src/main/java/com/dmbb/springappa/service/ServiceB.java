@@ -1,7 +1,5 @@
 package com.dmbb.springappa.service;
 
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.Map;
 
 public interface ServiceB {

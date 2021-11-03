@@ -1,4 +1,4 @@
-package com.dmbb.springappa.dto;
+package com.dmbb.springappb.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

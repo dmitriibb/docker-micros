@@ -1,9 +1,9 @@
 package com.dmbb.springappb.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.dmbb.springappb.constants.Constants;
+import com.dmbb.springappb.service.RestRequestService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,7 +11,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/home")
+@RequiredArgsConstructor
 public class HomeController {
+
+    private final RestRequestService restRequestService;
 
     @GetMapping
     public String getInto() {
@@ -31,6 +34,11 @@ public class HomeController {
         map.put("fruits", Arrays.asList("banana", "apple", "orange"));
 
         return map;
+    }
+
+    @GetMapping("/info/{serviceName}")
+    public String getOtherServiceInfo(@PathVariable String serviceName) {
+        return restRequestService.getHomeInfo(serviceName);
     }
 
 

@@ -1,13 +1,13 @@
 package com.dmbb.springappa.config;
 
-import com.dmbb.springappa.service.RestRequestService;
-import com.dmbb.springappa.service.hystrix.ServiceBHystrixCommand;
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandProperties;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.cloud.sleuth.instrument.async.LazyTraceThreadPoolTaskExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
+
+
 
 @Configuration
 public class Config {
@@ -17,17 +17,15 @@ public class Config {
         return new RestTemplate();
     }
 
-    /*@Bean
-    public ServiceBHystrixCommand serviceBHystrixCommand(RestRequestService restRequestService) {
-        HystrixCommand.Setter config = HystrixCommand
-                .Setter
-                .withGroupKey(HystrixCommandGroupKey.Factory.asKey("RemoteServiceGroup1"));
+    //With standard java executor Spring Sleuth doesn't create spans for different threads, so we need this Lazy thing
+    @Bean(name = "concurrentServiceExecutor")
+    public ThreadPoolTaskExecutor concurrentServiceExecutor(BeanFactory beanFactory) {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(2);
+        threadPoolTaskExecutor.setMaxPoolSize(4);
+        threadPoolTaskExecutor.initialize();
 
-        HystrixCommandProperties.Setter commandProperties = HystrixCommandProperties.Setter();
-        commandProperties.withExecutionTimeoutInMilliseconds(5000);
-        config.andCommandPropertiesDefaults(commandProperties);
-
-        return new ServiceBHystrixCommand(config, restRequestService);
-    }*/
+        return new LazyTraceThreadPoolTaskExecutor(beanFactory, threadPoolTaskExecutor);
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.dmbb.springappa.dto;
+package com.dmbb.springappa.model.dto;
 
 import lombok.*;
 

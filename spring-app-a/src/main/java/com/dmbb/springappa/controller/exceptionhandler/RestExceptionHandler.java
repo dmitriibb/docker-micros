@@ -1,6 +1,6 @@
 package com.dmbb.springappa.controller.exceptionhandler;
 
-import com.dmbb.springappa.dto.ErrorDTO;
+import com.dmbb.springappa.model.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
