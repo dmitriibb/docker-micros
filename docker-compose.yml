@@ -16,6 +16,14 @@ services:
     volumes:
       - ./zipkin:/var/jars
     command: java -jar /var/jars/zipkin-server-2.23.4-exec.jar
+  boot-admin:
+    image: openjdk:8
+    container_name: boot-admin
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./spring-boot-admin/target:/var/jars
+    command: java -jar /var/jars/bootadmin-0.0.1-SNAPSHOT.jar
   spring-app-a:
     image: openjdk:8
     container_name: spring-app-a
@@ -27,9 +35,11 @@ services:
     links:
       - eureka-server
       - zipkin-server
+      - boot-admin
     environment:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
+      SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
       SPRING_APP_B_HOST: spring-app-b
   spring-app-b:
     image: openjdk:8
@@ -42,9 +52,11 @@ services:
     links:
       - eureka-server
       - zipkin-server
+      - boot-admin
     environment:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
+      SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
   spring-app-c:
     image: openjdk:8
     container_name: spring-app-c
@@ -56,6 +68,8 @@ services:
     links:
       - eureka-server
       - zipkin-server
+      - boot-admin
     environment:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
+      SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
