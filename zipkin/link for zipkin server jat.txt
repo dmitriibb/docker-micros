@@ -1,0 +1,2 @@
+download zipkin-server jar from the link ot from goodle
+https://search.maven.org/remote_content?g=io.zipkin&a=zipkin-server&v=LATEST&c=exec
