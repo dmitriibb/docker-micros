@@ -1,5 +1,6 @@
 package com.dmbb.springappa.service;
 
+import com.dmbb.springappa.model.dto.FoodOrderDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
 
@@ -17,5 +18,9 @@ public interface FoodService {
     List<String> getCookedFood();
 
     TrayDTO getFoodOnTray();
+
+    String getBoiledWater(boolean reactive);
+
+    List<String> cookMeals(FoodOrderDTO foodOrderDTO, boolean reactive);
 
 }

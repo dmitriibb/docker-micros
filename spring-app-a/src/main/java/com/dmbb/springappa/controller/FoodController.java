@@ -1,15 +1,14 @@
 package com.dmbb.springappa.controller;
 
 import com.dmbb.springappa.model.dto.AggregationDTO;
+import com.dmbb.springappa.model.dto.FoodOrderDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
 import com.dmbb.springappa.service.ConcurrentService;
 import com.dmbb.springappa.service.FoodService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,6 +53,16 @@ public class FoodController {
     @GetMapping("/cook-on-tray")
     public TrayDTO cookFoodAndPutOnTray() {
         return foodService.getFoodOnTray();
+    }
+
+    @GetMapping("/boiled-water")
+    public String getBoiledWater(@RequestParam(required = false) boolean reactive) {
+        return foodService.getBoiledWater(reactive);
+    }
+
+    @PutMapping("/cook")
+    public List<String> cookMeals(@RequestBody FoodOrderDTO foodOrderDTO, @RequestParam(required = false) boolean reactive) {
+        return foodService.cookMeals(foodOrderDTO, reactive);
     }
 
 }

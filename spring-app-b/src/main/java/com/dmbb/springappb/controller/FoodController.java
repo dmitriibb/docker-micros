@@ -4,10 +4,7 @@ import com.dmbb.springappb.model.dto.FoodListDTO;
 import com.dmbb.springappb.service.FoodCookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +27,16 @@ public class FoodController {
 
         log.info("food has been cooked");
         return Arrays.asList(bananas, coffee, apples);
+    }
+
+    @GetMapping("cook/{meal}")
+    public String cookMeal(@PathVariable String meal) {
+        return foodCookService.cookMeal(meal);
+    }
+
+    @GetMapping("/boil-water")
+    public String boilWater() {
+        return foodCookService.boilWater();
     }
 
 

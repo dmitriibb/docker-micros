@@ -7,14 +7,16 @@ import com.dmbb.springappa.model.entity.Food;
 import com.dmbb.springappa.service.RestRequestService;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,12 +29,30 @@ import static com.dmbb.springappa.constants.Constants.SERVICE_B_NAME;
 import static com.dmbb.springappa.constants.Constants.SERVICE_C_NAME;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class RestRequestServiceImpl implements RestRequestService {
 
     private final RestTemplate restTemplate;
+
+    private final RestTemplate restTemplateLoadBalanced;
+
     private final EurekaClient eurekaClient;
+
+    private final WebClient webClient;
+
+    private final WebClient webClientLoadBalanced;
+
+    public RestRequestServiceImpl(@Qualifier("restTemplate") RestTemplate restTemplate,
+                                  @Qualifier("restTemplateLoadBalanced") RestTemplate restTemplateLoadBalanced,
+                                  @Qualifier("webClient") WebClient webClient,
+                                  @Qualifier("webClientLoadBalanced") WebClient webClientLoadBalanced,
+                                  EurekaClient eurekaClient) {
+        this.restTemplate = restTemplate;
+        this.restTemplateLoadBalanced = restTemplateLoadBalanced;
+        this.eurekaClient = eurekaClient;
+        this.webClient = webClient;
+        this.webClientLoadBalanced = webClientLoadBalanced;
+    }
 
     @Override
     public Map<String, Object> getMap(String fullUrl, Map<String, Object> params) {
@@ -46,6 +66,34 @@ public class RestRequestServiceImpl implements RestRequestService {
         String fullUrl = baseUrl + apiUrl;
         String urlWithParams = addUrlParams(fullUrl, params);
         return restTemplate.exchange(urlWithParams, HttpMethod.GET, null, Map.class, new HashMap<>()).getBody();
+    }
+
+    @Override
+    public String getString(String serviceName, String apiUrl) {
+        log.info("request for: " + apiUrl);
+        String fullUrl = "http://" + serviceName + "/" + apiUrl;
+        return restTemplateLoadBalanced.exchange(fullUrl, HttpMethod.GET, null, String.class, new HashMap<>()).getBody();
+    }
+
+    public Mono<String> getStringReactiveBalanced(String serviceName, String apiUrl) {
+        log.info("request for: " + apiUrl);
+        String fullUrl = "http://" + serviceName + "/" + apiUrl;
+        return webClientLoadBalanced.get()
+                .uri(fullUrl)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    @Override
+    public Mono<String> getStringReactive(String serviceName, String apiUrl) {
+        String baseUrl = getServiceBaseURL(serviceName);
+        String fullUrl = baseUrl+ apiUrl;
+        log.info("reactive request for: " + apiUrl);
+
+        return webClient.get()
+                .uri(fullUrl)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     @Override
@@ -66,7 +114,7 @@ public class RestRequestServiceImpl implements RestRequestService {
     }
 
     private String getServiceBaseURL(String serviceName) {
-        InstanceInfo instanceInfo = eurekaClient.getApplication(serviceName).getInstances().get(0);
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka(serviceName, false);
         return instanceInfo.getHomePageUrl();
     }
 

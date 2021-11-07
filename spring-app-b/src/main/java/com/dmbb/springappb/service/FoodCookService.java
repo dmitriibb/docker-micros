@@ -12,4 +12,8 @@ public interface FoodCookService {
 
     String caramelizeApples(List<FoodDTO> foodList);
 
+    String boilWater();
+
+    String cookMeal(String meal);
+
 }

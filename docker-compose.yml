@@ -40,10 +40,10 @@ services:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
       SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
-      SPRING_APP_B_HOST: spring-app-b
-  spring-app-b:
+      SPRING_APP_B_HOST: spring-app-b-1
+  spring-app-b-1:
     image: openjdk:8
-    container_name: spring-app-b
+    container_name: spring-app-b-1
     ports:
       - "8082:8082"
     volumes:
@@ -57,6 +57,24 @@ services:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
       SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
+      RESPONSE_DELAY: 1000
+      INSTANCE_NAME: fast_cat
+  spring-app-b-2:
+    image: openjdk:8
+    container_name: spring-app-b-2
+    volumes:
+      - ./spring-app-b/target:/var/jars
+    command: java -jar /var/jars/spring-app-b-0.0.1-SNAPSHOT.jar
+    links:
+      - eureka-server
+      - zipkin-server
+      - boot-admin
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin-server:9411
+      SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
+      RESPONSE_DELAY: 3000
+      INSTANCE_NAME: slow_dog
   spring-app-c:
     image: openjdk:8
     container_name: spring-app-c
