@@ -1,6 +1,7 @@
 package com.dmbb.springappa.service.impl;
 
 import com.dmbb.springappa.constants.Constants;
+import com.dmbb.springappa.model.RestCallSettings;
 import com.dmbb.springappa.model.dto.FoodOrderDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -60,37 +62,48 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public List<String> getCookedFood() {
+    public List<String> getCookedFood(RestCallSettings settings) {
         log.info("sending food for cooking");
         List<Food> foodList = getAllFood();
-        List<String> cookedFood = restRequestService.cookFoodInServiceB(foodList);
+        List<String> cookedFood;
+        if (settings.isReactive())
+            cookedFood = restRequestService.cookFoodReactive(foodList, settings).block();
+        else
+            cookedFood = restRequestService.cookFood(foodList, settings);
+
         log.info("received cooked food from service b");
         return cookedFood;
     }
 
     @Override
-    public TrayDTO getFoodOnTray() {
-        List<String> foodList = getCookedFood();
-        return restRequestService.getTrayFromServiceC(foodList);
+    public TrayDTO getFoodOnTray(RestCallSettings settings) {
+        List<String> foodList = getCookedFood(settings);
+        return restRequestService.getTrayWithCookedFood(foodList, settings);
     }
 
     @Override
-    public String getBoiledWater(boolean reactive) {
-        if (reactive)
-            return restRequestService.getStringReactiveBalanced(Constants.SERVICE_B_NAME, "food/boil-water").block();
+    public String getBoiledWater(RestCallSettings settings) {
+        if (settings.isReactive())
+            return restRequestService.getString(Constants.SERVICE_B_NAME, "food/boil-water", settings).block();
         else
             return restRequestService.getString(Constants.SERVICE_B_NAME, "food/boil-water");
     }
 
     @Override
-    public List<String> cookMeals(FoodOrderDTO foodOrderDTO, boolean reactive) {
+    public List<String> cookMeals(FoodOrderDTO foodOrderDTO, RestCallSettings settings) {
         long timeStart = System.currentTimeMillis();
-        List<String> order = new ArrayList<>();
+        List<String> order;
 
-        if (reactive)
-            addCookedMealToOrderReactive(order, foodOrderDTO.getMeals());
+        if (settings.isReactive())
+            order = Flux.fromIterable(foodOrderDTO.getMeals())
+                    .flatMap(meal -> restRequestService.getString(Constants.SERVICE_B_NAME, "food/cook/" + meal, settings))
+                    .collectList()
+                    .block();
         else
-            foodOrderDTO.getMeals().forEach(meal -> addCookedMealToOrder(order, meal));
+            order = foodOrderDTO.getMeals()
+                    .stream()
+                    .map(meal -> restRequestService.getString(Constants.SERVICE_B_NAME, "food/cook/" + meal))
+                    .collect(Collectors.toList());
 
         String timeTaken = "cooking order took " + (System.currentTimeMillis() - timeStart) + " ms";
         order.add(timeTaken);
@@ -98,18 +111,5 @@ public class FoodServiceImpl implements FoodService {
         return order;
     }
 
-    private void addCookedMealToOrder(List<String> order, String meal) {
-        String cookedMeal = restRequestService.getString(Constants.SERVICE_B_NAME, "food/cook/" + meal);
-        order.add(cookedMeal);
-    }
-
-    private void addCookedMealToOrderReactive(List<String> order, List<String> meals) {
-        List<String> res = Flux.fromIterable(meals)
-                .flatMap(meal -> restRequestService.getStringReactive(Constants.SERVICE_B_NAME, "food/cook/" + meal))
-                .collectList()
-                .block();
-
-        order.addAll(res);
-    }
 
 }

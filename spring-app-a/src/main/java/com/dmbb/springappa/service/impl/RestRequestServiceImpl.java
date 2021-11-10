@@ -1,6 +1,8 @@
 package com.dmbb.springappa.service.impl;
 
+import com.dmbb.springappa.constants.Constants;
 import com.dmbb.springappa.exceptions.ServiceARuntimeException;
+import com.dmbb.springappa.model.RestCallSettings;
 import com.dmbb.springappa.model.dto.FoodListDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
@@ -25,8 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import static com.dmbb.springappa.constants.Constants.SERVICE_B_NAME;
-import static com.dmbb.springappa.constants.Constants.SERVICE_C_NAME;
+import static com.dmbb.springappa.constants.Constants.*;
 
 @Service
 @Slf4j
@@ -75,42 +76,78 @@ public class RestRequestServiceImpl implements RestRequestService {
         return restTemplateLoadBalanced.exchange(fullUrl, HttpMethod.GET, null, String.class, new HashMap<>()).getBody();
     }
 
-    public Mono<String> getStringReactiveBalanced(String serviceName, String apiUrl) {
-        log.info("request for: " + apiUrl);
-        String fullUrl = "http://" + serviceName + "/" + apiUrl;
-        return webClientLoadBalanced.get()
+    @Override
+    public Mono<String> getString(String serviceName, String api, RestCallSettings settings) {
+        String fullUrl = getFullUrl(serviceName, api, settings);
+        log.info("calling: " + fullUrl);
+
+        return getWebClient(settings)
+                .get()
                 .uri(fullUrl)
                 .retrieve()
                 .bodyToMono(String.class);
     }
 
     @Override
-    public Mono<String> getStringReactive(String serviceName, String apiUrl) {
-        String baseUrl = getServiceBaseURL(serviceName);
-        String fullUrl = baseUrl+ apiUrl;
-        log.info("reactive request for: " + apiUrl);
-
-        return webClient.get()
-                .uri(fullUrl)
-                .retrieve()
-                .bodyToMono(String.class);
-    }
-
-    @Override
-    public List<String> cookFoodInServiceB(List<Food> foodList) {
-        String baseUrl = getServiceBaseURL(SERVICE_B_NAME);
-        String fullUrl = baseUrl + "/food/cook";
+    public List<String> cookFood(List<Food> foodList, RestCallSettings settings) {
+        String fullUrl = getFullUrl(SERVICE_B_NAME, "food/cook", settings);
 
         RequestEntity requestEntity = new RequestEntity(new FoodListDTO(foodList), HttpMethod.POST, getURI(fullUrl));
-        return restTemplate.exchange(requestEntity, new ParameterizedTypeReference<List<String>>() {}).getBody();
+        return getRestTemplate(settings)
+                .exchange(requestEntity, new ParameterizedTypeReference<List<String>>() {})
+                .getBody();
     }
 
     @Override
-    public TrayDTO getTrayFromServiceC(List<String> foodList) {
-        String baseUrl = getServiceBaseURL(SERVICE_C_NAME);
-        String fullUrl = baseUrl + "/food/put-on-tray";
+    public Mono<List<String>> cookFoodReactive(List<Food> foodList, RestCallSettings settings) {
+        String fullUrl = getFullUrl(SERVICE_B_NAME, "food/cook", settings);
+
+        return getWebClient(settings)
+                .post()
+                .uri(fullUrl)
+                .bodyValue(new FoodListDTO(foodList))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {});
+
+    }
+
+    @Override
+    public TrayDTO getTrayWithCookedFood(List<String> foodList, RestCallSettings settings) {
+        String fullUrl = getFullUrl(SERVICE_C_NAME, "food/put-on-tray", settings);
+
         RequestEntity requestEntity = new RequestEntity(foodList, HttpMethod.POST, getURI(fullUrl));
-        return restTemplate.exchange(requestEntity, TrayDTO.class).getBody();
+        return getRestTemplate(settings)
+                .exchange(requestEntity, TrayDTO.class)
+                .getBody();
+    }
+
+    private WebClient getWebClient(RestCallSettings settings) {
+        return settings.isLoadBalancer() ? webClientLoadBalanced : webClient;
+    }
+
+    private RestTemplate getRestTemplate(RestCallSettings settings) {
+        return settings.isLoadBalancer() ? restTemplateLoadBalanced : restTemplate;
+    }
+
+    private String getFullUrl(String serviceName, String api, RestCallSettings settings) {
+        if (settings.isLoadBalancer())
+            return getFullUrlWithLoadBalancer(serviceName, api, settings);
+        else
+            return getFullUrlWithDiscoveryClient(serviceName, api, settings);
+    }
+
+    private String getFullUrlWithLoadBalancer(String serviceName, String api, RestCallSettings settings) {
+        if (settings.isGateway())
+            return "http://" + Constants.GATEWAY_SERVICE_NAME + "/" + serviceName + "/" + api;
+        else
+            return "http://" + serviceName + "/" + api;
+    }
+
+    private String getFullUrlWithDiscoveryClient(String serviceName, String api, RestCallSettings settings) {
+        if (settings.isGateway())
+            return getServiceBaseURL(GATEWAY_SERVICE_NAME) + serviceName + "/" + api;
+        else
+            return getServiceBaseURL(serviceName)  + api;
     }
 
     private String getServiceBaseURL(String serviceName) {

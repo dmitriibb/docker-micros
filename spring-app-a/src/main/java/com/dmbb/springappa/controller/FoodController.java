@@ -1,5 +1,6 @@
 package com.dmbb.springappa.controller;
 
+import com.dmbb.springappa.model.RestCallSettings;
 import com.dmbb.springappa.model.dto.AggregationDTO;
 import com.dmbb.springappa.model.dto.FoodOrderDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
@@ -46,23 +47,48 @@ public class FoodController {
     }
 
     @GetMapping("/cook")
-    public List<String> cookFood() {
-        return foodService.getCookedFood();
+    public List<String> cookFood(@RequestParam(required = false) boolean reactive,
+                                 @RequestParam(required = false) boolean gateway,
+                                 @RequestParam(required = false) boolean loadBalancer) {
+        RestCallSettings settings = new RestCallSettings();
+        settings.setReactive(reactive);
+        settings.setGateway(gateway);
+        settings.setLoadBalancer(loadBalancer);
+        return foodService.getCookedFood(settings);
     }
 
     @GetMapping("/cook-on-tray")
-    public TrayDTO cookFoodAndPutOnTray() {
-        return foodService.getFoodOnTray();
+    public TrayDTO cookFoodAndPutOnTray(@RequestParam(required = false) boolean reactive,
+                                        @RequestParam(required = false) boolean gateway,
+                                        @RequestParam(required = false) boolean loadBalancer) {
+        RestCallSettings settings = new RestCallSettings();
+        settings.setReactive(reactive);
+        settings.setGateway(gateway);
+        settings.setLoadBalancer(loadBalancer);
+        return foodService.getFoodOnTray(settings);
     }
 
     @GetMapping("/boiled-water")
-    public String getBoiledWater(@RequestParam(required = false) boolean reactive) {
-        return foodService.getBoiledWater(reactive);
+    public String getBoiledWater(@RequestParam(required = false) boolean reactive,
+                                 @RequestParam(required = false) boolean gateway,
+                                 @RequestParam(required = false) boolean loadBalancer) {
+        RestCallSettings settings = new RestCallSettings();
+        settings.setReactive(reactive);
+        settings.setGateway(gateway);
+        settings.setLoadBalancer(loadBalancer);
+        return foodService.getBoiledWater(settings);
     }
 
     @PutMapping("/cook")
-    public List<String> cookMeals(@RequestBody FoodOrderDTO foodOrderDTO, @RequestParam(required = false) boolean reactive) {
-        return foodService.cookMeals(foodOrderDTO, reactive);
+    public List<String> cookMeals(@RequestBody FoodOrderDTO foodOrderDTO,
+                                  @RequestParam(required = false) boolean reactive,
+                                  @RequestParam(required = false) boolean gateway,
+                                  @RequestParam(required = false) boolean loadBalancer) {
+        RestCallSettings settings = new RestCallSettings();
+        settings.setReactive(reactive);
+        settings.setGateway(gateway);
+        settings.setLoadBalancer(loadBalancer);
+        return foodService.cookMeals(foodOrderDTO, settings);
     }
 
 }

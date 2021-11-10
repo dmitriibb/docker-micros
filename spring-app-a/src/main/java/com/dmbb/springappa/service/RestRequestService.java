@@ -1,5 +1,6 @@
 package com.dmbb.springappa.service;
 
+import com.dmbb.springappa.model.RestCallSettings;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
 import reactor.core.publisher.Mono;
@@ -15,12 +16,12 @@ public interface RestRequestService {
 
     String getString(String serviceName, String apiRL);
 
-    Mono<String> getStringReactiveBalanced(String serviceName, String apiUrl);
+    Mono<String> getString(String serviceName, String api, RestCallSettings settings);
 
-    Mono<String> getStringReactive(String serviceName, String apiRL);
+    List<String> cookFood(List<Food> foodList, RestCallSettings settings);
 
-    List<String> cookFoodInServiceB(List<Food> foodList);
+    Mono<List<String>> cookFoodReactive(List<Food> foodList, RestCallSettings settings);
 
-    TrayDTO getTrayFromServiceC(List<String> foodList);
+    TrayDTO getTrayWithCookedFood(List<String> foodList, RestCallSettings settings);
 
 }

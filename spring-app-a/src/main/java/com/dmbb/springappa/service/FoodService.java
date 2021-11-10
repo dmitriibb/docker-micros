@@ -1,5 +1,6 @@
 package com.dmbb.springappa.service;
 
+import com.dmbb.springappa.model.RestCallSettings;
 import com.dmbb.springappa.model.dto.FoodOrderDTO;
 import com.dmbb.springappa.model.dto.TrayDTO;
 import com.dmbb.springappa.model.entity.Food;
@@ -15,12 +16,12 @@ public interface FoodService {
 
     Map<String, Integer> aggregateFoodByName(List<Food> foodList);
 
-    List<String> getCookedFood();
+    List<String> getCookedFood(RestCallSettings settings);
 
-    TrayDTO getFoodOnTray();
+    TrayDTO getFoodOnTray(RestCallSettings settings);
 
-    String getBoiledWater(boolean reactive);
+    String getBoiledWater(RestCallSettings settings);
 
-    List<String> cookMeals(FoodOrderDTO foodOrderDTO, boolean reactive);
+    List<String> cookMeals(FoodOrderDTO foodOrderDTO, RestCallSettings settings);
 
 }
