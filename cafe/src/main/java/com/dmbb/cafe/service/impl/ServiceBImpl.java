@@ -23,9 +23,6 @@ public class ServiceBImpl implements ServiceB {
     private static final String APP_B_NAME = "spring-app-b";
     private static final String PARAM_DELAY = "delay";
 
-    @Value("${spring-app-b.host}")
-    private String serviceBHost;
-
     private final RestRequestService restRequestService;
 
     @Override
@@ -33,13 +30,6 @@ public class ServiceBImpl implements ServiceB {
         log.info("calling spring-app-b via eureka");
         Map<String, Object> params = ImmutableMap.of(PARAM_DELAY, 0);
         return restRequestService.getMap(APP_B_NAME, "home/for-service-a", params);
-    }
-
-    @Override
-    public Map<String, Object> getInfoDirect() {
-        log.info("calling spring-app-b directly");
-        Map<String, Object> params = ImmutableMap.of(PARAM_DELAY, 0);
-        return restRequestService.getMap("http://" + serviceBHost + ":8082/home/for-service-a", params);
     }
 
     @Override

@@ -21,11 +21,6 @@ public class ServiceBController {
         return serviceB.getInfoViaEureka();
     }
 
-    @GetMapping("/info/direct")
-    public Map<String, Object> getInfoDirect() {
-        return serviceB.getInfoDirect();
-    }
-
     @GetMapping("/info/hystrix")
     public Map<String, Object> getInfoViaHystrix(@RequestParam int delay, @RequestParam int timeout) {
         return serviceB.getInfoViaHystrix(delay, timeout);
