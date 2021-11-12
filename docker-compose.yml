@@ -40,14 +40,14 @@ services:
       - eureka-server
       - zipkin-server
       - boot-admin
-  spring-app-a:
+  cafe-app:
     image: openjdk:8
-    container_name: spring-app-a
+    container_name: cafe-app
     ports:
       - "8081:8081"
     volumes:
-      - ./spring-app-a/target:/var/jars
-    command: java -jar /var/jars/spring-app-a-0.0.1-SNAPSHOT.jar
+      - ./cafe/target:/var/jars
+    command: java -jar /var/jars/cafe-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
       - zipkin-server
@@ -57,15 +57,14 @@ services:
       EUREKA_URI: http://eureka-server:8761/eureka
       ZIPKIN_URI: http://zipkin-server:9411
       SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
-      SPRING_APP_B_HOST: spring-app-b-1
-  spring-app-b-1:
+  kitchen-app:
     image: openjdk:8
-    container_name: spring-app-b-1
+    container_name: kitchen-app
     ports:
       - "8082:8082"
     volumes:
-      - ./spring-app-b/target:/var/jars
-    command: java -jar /var/jars/spring-app-b-0.0.1-SNAPSHOT.jar
+      - ./kitchen/target:/var/jars
+    command: java -jar /var/jars/kitchen-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
       - zipkin-server
@@ -77,12 +76,12 @@ services:
       SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
       RESPONSE_DELAY: 1000
       INSTANCE_NAME: fast_cat
-  spring-app-b-2:
+  kitchen-app-2:
     image: openjdk:8
-    container_name: spring-app-b-2
+    container_name: skitchen-app-2
     volumes:
-      - ./spring-app-b/target:/var/jars
-    command: java -jar /var/jars/spring-app-b-0.0.1-SNAPSHOT.jar
+      - ./kitchen/target:/var/jars
+    command: java -jar /var/jars/kitchen-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
       - zipkin-server
@@ -94,14 +93,14 @@ services:
       SPRING_BOOT_ADMIN_URI: http://boot-admin:8085
       RESPONSE_DELAY: 3000
       INSTANCE_NAME: slow_dog
-  spring-app-c:
+  steward-app:
     image: openjdk:8
-    container_name: spring-app-c
+    container_name: steward-app
     ports:
       - "8083:8083"
     volumes:
-      - ./spring-app-c/target:/var/jars
-    command: java -jar /var/jars/spring-app-c-0.0.1-SNAPSHOT.jar
+      - ./steward/target:/var/jars
+    command: java -jar /var/jars/steward-0.0.1-SNAPSHOT.jar
     links:
       - eureka-server
       - zipkin-server

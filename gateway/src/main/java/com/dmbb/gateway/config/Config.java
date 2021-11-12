@@ -1,7 +1,5 @@
 package com.dmbb.gateway.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.Buildable;
@@ -9,21 +7,20 @@ import org.springframework.cloud.gateway.route.builder.PredicateSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class Config {
 
-    private static final String APP_A_URL ="/spring-app-a";
-    private static final String APP_B_URL ="/spring-app-b";
-    private static final String APP_C_URL ="/spring-app-c";
+    private static final String SERVICE_CAFE ="/cafe";
+    private static final String SERVICE_KITCHEN ="/kitchen";
+    private static final String SERVICE_STEWARD ="/steward";
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
         return routeLocatorBuilder.routes()
-                .route(p -> routeServiceEureka(p, APP_A_URL))
-                .route(p -> routeServiceEureka(p, APP_B_URL))
-                .route(p -> routeServiceEureka(p, APP_C_URL))
+                .route(p -> routeServiceEureka(p, SERVICE_CAFE))
+                .route(p -> routeServiceEureka(p, SERVICE_KITCHEN))
+                .route(p -> routeServiceEureka(p, SERVICE_STEWARD))
                 .build();
     }
 
