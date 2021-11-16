@@ -1,0 +1,46 @@
+version: '3'
+services:
+  eureka-mock:
+    image: openjdk:8
+    container_name: eureka-mock
+    ports:
+      - "8761:8761"
+    volumes:
+      - ../eureka/target:/var/jars
+    command: java -jar /var/jars/eureka-1.0.jar
+  zipkin-mock:
+    image: openjdk:8
+    container_name: zipkin-mock
+    ports:
+      - "9411:9411"
+    volumes:
+      - ../zipkin:/var/jars
+    command: java -jar /var/jars/zipkin-server-2.23.4-exec.jar
+  boot-admin-mock:
+    image: openjdk:8
+    container_name: boot-admin-mock
+    ports:
+      - "8085:8085"
+    volumes:
+      - ../spring-boot-admin/target:/var/jars
+    command: java -jar /var/jars/bootadmin-1.0.jar
+  zookeeper-mock:
+    image: 'bitnami/zookeeper:latest'
+    container_name: zookeeper-mock
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka-mock
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-mock:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    links:
+      - zookeeper-mock

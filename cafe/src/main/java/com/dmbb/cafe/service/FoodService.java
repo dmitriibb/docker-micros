@@ -1,5 +1,6 @@
 package com.dmbb.cafe.service;
 
+import com.dmbb.cafe.exceptions.NotEnoughFoodInStorageException;
 import com.dmbb.cafe.model.RestCallSettings;
 import com.dmbb.cafe.model.dto.FoodOrderDTO;
 import com.dmbb.cafe.model.dto.TrayDTO;
@@ -12,9 +13,9 @@ public interface FoodService {
 
     List<Food> getAllFood();
 
-    Map<String, Integer> aggregateFoodByColor(List<Food> foodList);
+    Map<String, Integer> getFoodFromStorage(Map<String, Integer> foodAmountMap);
 
-    Map<String, Integer> aggregateFoodByName(List<Food> foodList);
+    void addFoodToStorage(String foodName, int number);
 
     List<String> getCookedFood(RestCallSettings settings);
 

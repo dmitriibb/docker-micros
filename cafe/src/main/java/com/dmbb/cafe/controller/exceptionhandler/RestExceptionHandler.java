@@ -15,6 +15,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDTO handleAllExceptions(Exception e) {
+        log.error(e.getMessage(), e);
         return new ErrorDTO(e.getMessage(), ExceptionUtils.getStackTrace(e));
     }
 
