@@ -6,9 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -26,11 +24,11 @@ public class OrderMealStatus implements Comparable<OrderMealStatus>{
 
     private Date receivedTime = new Date();
 
-    private Map<String, String> progress = new LinkedHashMap<>();
+    private List<String> progress = new ArrayList<>();
 
     public void setStatus(String status) {
         this.status = status;
-        progress.put(new SimpleDateFormat(DATE_TIME_FORMAT).format(new Date()), status);
+        progress.add(new SimpleDateFormat(DATE_TIME_FORMAT).format(new Date()) + " - " +status);
     }
 
     @Override

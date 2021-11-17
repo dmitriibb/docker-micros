@@ -6,12 +6,14 @@ import com.dmbb.cafe.model.enums.AuditEventType;
 import com.dmbb.cafe.service.AuditService;
 import com.dmbb.cafe.service.SimpleWorker;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Slf4j
+@Service
 public class AuditServiceImpl implements AuditService {
 
     private List<AuditEvent> data = new ArrayList<>();

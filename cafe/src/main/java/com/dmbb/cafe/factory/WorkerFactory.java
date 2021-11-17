@@ -13,8 +13,8 @@ public class WorkerFactory {
     private final SupplierService supplierService;
     private final OrderStatusService orderStatusService;
 
-    public SimpleWorker getWorker(String name) {
-        return new SimpleWorker(name, foodService, auditService, supplierService, orderStatusService);
+    public SimpleWorker getWorker(String name, OrderManagerService orderManagerService) {
+        return new SimpleWorker(name, foodService, auditService, supplierService, orderStatusService, orderManagerService);
     }
 
 }

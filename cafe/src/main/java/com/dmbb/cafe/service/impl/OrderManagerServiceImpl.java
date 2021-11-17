@@ -31,11 +31,13 @@ public class OrderManagerServiceImpl implements OrderManagerService {
     private final OrderStatusService orderStatusService;
     private final MenuService menuService;
     private final WorkerFactory workerFactory;
+    private final SupplierService supplierService;
 
     @PostConstruct
     public void init() {
-        workers.put("dima", workerFactory.getWorker("dima"));
+        workers.put("dima", workerFactory.getWorker("dima", this));
         mealsOrdered.subscribe(this::dispatchNewMeal);
+        supplierService.subscribeForArrivedFood(this::dispatchMealWaitingForFoodSupply);
     }
 
     @Override
@@ -47,14 +49,18 @@ public class OrderManagerServiceImpl implements OrderManagerService {
                 .values()
                 .forEach(mealStatus -> mealsOrdered.onNext(mealStatus));
 
-        return orderStatus.getStatus();
+        return orderStatus.getId();
+    }
+
+    @Override
+    public void putOrderMealStatusToWaitingForFoodSupply(OrderMealStatus orderMealStatus) {
+        mealsWaitingForFood.add(orderMealStatus);
     }
 
     private void dispatchNewMeal(OrderMealStatus orderMealStatus) {
         for (SimpleWorker worker : workers.values()) {
-            if (worker.isIdle()) {
-                log.info("assigning " + orderMealStatus + " to worker " + worker.getName());
-                worker.startNewMeal(orderMealStatus);
+            if (worker.startNewMealTask(orderMealStatus)) {
+                log.info("assigned " + orderMealStatus + " to worker " + worker.getName());
                 return;
             }
         }
@@ -63,8 +69,21 @@ public class OrderManagerServiceImpl implements OrderManagerService {
         dispatchNewMeal(orderMealStatus);
     }
 
-    private void dispatchMealWaitingForFoodSupply() {
+    private void dispatchMealWaitingForFoodSupply(String s) {
+        OrderMealStatus orderMealStatusToProceed = mealsWaitingForFood.poll();
+        if (orderMealStatusToProceed == null)
+            return;
 
+        for (SimpleWorker worker : workers.values()) {
+            if (worker.continueMealTask(orderMealStatusToProceed)) {
+                log.info("assigned " + orderMealStatusToProceed + " to worker " + worker.getName());
+                return;
+            }
+        }
+        log.info("waiting for an idle worker to assign " + orderMealStatusToProceed);
+        MyUtils.delay(5000);
+        mealsWaitingForFood.add(orderMealStatusToProceed);
+        dispatchMealWaitingForFoodSupply(s);
     }
 
     private void validateOrderMeals(Map<String, Integer> orderMeals) {

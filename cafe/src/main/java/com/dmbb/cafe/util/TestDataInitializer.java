@@ -62,7 +62,7 @@ public class TestDataInitializer {
 
     private void initFood() {
         foodRepository.save(new Food("banana", 5));
-        foodRepository.save(new Food("milk", 3));
+        foodRepository.save(new Food("milk", 2));
         foodRepository.save(new Food("apple", 8));
         foodRepository.save(new Food("sugar", 3));
         foodRepository.save(new Food("pineapple", 21));

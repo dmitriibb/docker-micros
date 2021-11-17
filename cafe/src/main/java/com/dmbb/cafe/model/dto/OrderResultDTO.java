@@ -7,12 +7,12 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class OrderStatusDTO {
+public class OrderResultDTO {
 
     private String orderId;
 
-    private String status;
+    private Map<String, Integer> meals;
 
-    private Map<String, Map<String, Integer>> meals;
+    private int cost;
 
 }
