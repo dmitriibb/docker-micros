@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Food {
-
-    private String name;
-
-    private String color;
+public class Food extends BaseEntity{
 
     private int number;
 
+    public Food(String name, int number) {
+        setName(name);
+        this.number = number;
+    }
 }

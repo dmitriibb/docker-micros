@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.dmbb</groupId>
 	<artifactId>cafe</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>cafe</name>
 	<description>cafe</description>
 	<properties>
@@ -44,6 +44,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
 		<dependency>

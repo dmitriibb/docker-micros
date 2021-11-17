@@ -20,30 +20,11 @@ import java.util.List;
 public class FoodController {
 
     private final FoodService foodService;
-    private final ConcurrentService concurrentService;
-
 
     @GetMapping
     private List<Food> getAllFood() {
         log.info("return all food from food controller");
         return foodService.getAllFood();
-    }
-
-    @GetMapping("/aggregate")
-    public AggregationDTO getFoodAggregated() {
-        log.info("get aggregated food from food controller");
-        List<Food> foodList = foodService.getAllFood();
-        return concurrentService.aggregateFood(foodList);
-    }
-
-    @GetMapping("/aggregate-2")
-    public AggregationDTO getFoodAggregated2() {
-        log.info("get aggregated food from food controller");
-        List<Food> foodList = foodService.getAllFood();
-        AggregationDTO dto = new AggregationDTO();
-        dto.addMetric("name", foodService.aggregateFoodByName(foodList));
-        dto.addMetric("color", foodService.aggregateFoodByColor(foodList));
-        return dto;
     }
 
     @GetMapping("/cook")

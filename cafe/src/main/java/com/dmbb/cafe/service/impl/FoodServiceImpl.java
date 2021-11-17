@@ -1,6 +1,7 @@
 package com.dmbb.cafe.service.impl;
 
 import com.dmbb.cafe.constants.Constants;
+import com.dmbb.cafe.exceptions.NotEnoughFoodInStorageException;
 import com.dmbb.cafe.model.RestCallSettings;
 import com.dmbb.cafe.model.dto.FoodOrderDTO;
 import com.dmbb.cafe.model.dto.TrayDTO;
@@ -29,33 +30,17 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<Food> getAllFood() {
         log.info("return all food from FoodService");
-        return foodRepository.getAllFood();
+        return foodRepository.getAll();
     }
 
     @Override
-    public Map<String, Integer> aggregateFoodByColor(List<Food> foodList) {
-        log.info("aggregating food by color");
-        Map<String, Integer> foodMap = new HashMap<>();
-        foodList.forEach(food -> {
-            Integer total = foodMap.get(food.getColor());
-            total = total == null ? food.getNumber() : total + food.getNumber();
-            foodMap.put(food.getColor(), total);
-        });
-
-        return foodMap;
+    public Map<String, Integer> getFoodFromStorage(Map<String, Integer> foodAmountMap){
+        return foodRepository.getFoodFromStorage(foodAmountMap);
     }
 
     @Override
-    public Map<String, Integer> aggregateFoodByName(List<Food> foodList) {
-        log.info("aggregating food by name");
-        Map<String, Integer> foodMap = new HashMap<>();
-        foodList.forEach(food -> {
-            Integer total = foodMap.get(food.getName());
-            total = total == null ? food.getNumber() : total + food.getNumber();
-            foodMap.put(food.getName(), total);
-        });
-
-       return foodMap;
+    public void addFoodToStorage(String foodName, int number) {
+        foodRepository.addFoodToStorage(foodName, number);
     }
 
     @Override
